@@ -64,7 +64,7 @@ import { ViewportLayoutComponent } from '../../../../core/components/viewport-la
       </section>
 
       <!-- Interactive Section (Right/Bottom) -->
-      <section class="interactive-section section-content">
+      <section class="interactive-section section-content animate-fade-in">
         <div class="main-content">
           <!-- Room Info Card (when in room) -->
           <div *ngIf="currentRoom()" class="room-info-section animate-scale-in">
@@ -316,6 +316,41 @@ import { ViewportLayoutComponent } from '../../../../core/components/viewport-la
     </app-viewport-layout>
   `,
   styles: `
+    /* Container */
+    .lobby-container {
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      padding: var(--space-6);
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    /* Prevent horizontal scroll on mobile */
+    * {
+      box-sizing: border-box;
+    }
+
+    .glass-card,
+    .glass-card-hover,
+    .form-card {
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+
+    /* Section Content */
+    .section-content {
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .section-content {
+        height: auto;
+        min-height: auto;
+      }
+    }
+
     /* Hero Section */
     .hero-section {
       display: flex;
@@ -339,11 +374,19 @@ import { ViewportLayoutComponent } from '../../../../core/components/viewport-la
     }
 
     .brand-logo {
-      display: inline-flex;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: var(--space-4);
+      gap: var(--space-2);
       margin-bottom: var(--space-6);
       position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .brand-logo {
+        flex-direction: row;
+        gap: var(--space-4);
+      }
     }
 
     .logo-icon {
@@ -431,6 +474,16 @@ import { ViewportLayoutComponent } from '../../../../core/components/viewport-la
       align-items: center;
       justify-content: center;
       position: relative;
+      min-height: 60vh;
+      padding: var(--space-6);
+    }
+
+    @media (max-width: 768px) {
+      .interactive-section {
+        min-height: auto;
+        align-items: flex-start;
+        padding-top: var(--space-4);
+      }
     }
 
     /* Main Content */
@@ -907,17 +960,43 @@ import { ViewportLayoutComponent } from '../../../../core/components/viewport-la
     }
 
     /* Responsive Design */
+    @media (max-width: 1024px) {
+      .lobby-container {
+        padding: var(--space-4);
+      }
+
+      .floating-cards {
+        opacity: 0.3;
+      }
+    }
+
     @media (max-width: 768px) {
+      .lobby-container {
+        min-height: 100vh;
+        padding: var(--space-3);
+      }
+
       .hero-content {
         padding: var(--space-4);
+        min-height: auto;
       }
       
       .brand-title {
-        font-size: var(--text-4xl);
+        font-size: var(--text-3xl);
       }
 
       .brand-subtitle {
-        font-size: var(--text-lg);
+        font-size: var(--text-base);
+      }
+
+      .tabs-header {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .tab-button {
+        width: 100%;
+        justify-content: center;
       }
       
       .form-content,
@@ -927,18 +1006,59 @@ import { ViewportLayoutComponent } from '../../../../core/components/viewport-la
         padding: var(--space-4);
       }
 
-      .team-stats {
+      .form-section {
+        min-height: auto;
+      }
+
+      .room-container {
+        min-height: auto;
+      }
+
+      .room-header {
         flex-direction: column;
-        gap: var(--space-2);
+        text-align: center;
+        gap: var(--space-3);
+      }
+
+      .room-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .room-code-display {
+        margin-top: var(--space-2);
+      }
+
+      .team-stats {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+      }
+
+      .stat-item {
+        min-width: 100px;
       }
 
       .participants-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        text-align: center;
+        gap: var(--space-3);
       }
 
       .button-group {
         flex-direction: column;
+        width: 100%;
+      }
+
+      .glass-btn {
+        width: 100%;
+      }
+
+      .participant-card {
+        padding: var(--space-3);
       }
 
       .floating-cards {
@@ -947,26 +1067,155 @@ import { ViewportLayoutComponent } from '../../../../core/components/viewport-la
     }
 
     @media (max-width: 480px) {
-      .tab-button {
-        flex-direction: column;
-        gap: var(--space-1);
+      .lobby-container {
+        padding: var(--space-2);
+      }
+
+      /* Fix connection status on mobile */
+      .connection-status {
+        top: var(--space-2);
+        right: var(--space-2);
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--text-xs);
+        min-width: auto;
+      }
+
+      /* Fix hero section on mobile */
+      .hero-section {
+        min-height: 35vh;
         padding: var(--space-3);
       }
 
-      .tab-text {
-        font-size: var(--text-xs);
+      .hero-content {
+        padding: var(--space-3);
       }
 
-      .room-header {
+      .logo-icon {
+        width: 3.5rem;
+        height: 3.5rem;
+        font-size: var(--text-2xl);
+      }
+
+      .brand-title {
+        font-size: var(--text-2xl);
+        margin-top: var(--space-2);
+      }
+
+      .brand-subtitle {
+        font-size: var(--text-sm);
+        text-align: center;
+      }
+
+      /* Fix interactive section on mobile */
+      .interactive-section {
+        padding: var(--space-3);
+      }
+
+      .main-content {
+        padding: 0;
+      }
+
+      .room-setup {
+        margin-top: var(--space-3);
+      }
+
+      .tab-navigation {
+        padding: var(--space-1);
+        gap: var(--space-1);
+      }
+
+      .tab-button {
+        flex: 1;
+        min-width: 120px;
+        padding: var(--space-3) var(--space-2);
+        font-size: var(--text-sm);
+      }
+
+      .tab-icon {
+        font-size: var(--text-lg);
+      }
+
+      .tab-text {
+        font-size: var(--text-sm);
+      }
+
+      .form-section {
+        margin-top: var(--space-3);
+      }
+
+      .form-card {
+        margin: 0;
+      }
+
+      .form-header,
+      .form-content {
+        padding: var(--space-3);
+      }
+
+      .form-title {
+        font-size: var(--text-xl);
+      }
+
+      .form-subtitle {
+        font-size: var(--text-sm);
+      }
+
+      .glass-form-label {
+        font-size: var(--text-sm);
+      }
+
+      .glass-form-input {
+        font-size: var(--text-base);
+        padding: var(--space-3);
+      }
+
+      .room-code-input {
+        font-size: var(--text-lg);
+        letter-spacing: 0.1em;
+      }
+
+      .room-name {
+        font-size: var(--text-xl);
+      }
+
+      .room-code-display {
         flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-3);
+        gap: var(--space-2);
+        padding: var(--space-3);
+      }
+
+      .copy-code-btn {
+        width: 100%;
+        justify-content: center;
+        padding: var(--space-2) var(--space-4);
+      }
+
+      .participant-info {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .participant-name {
+        font-size: var(--text-sm);
       }
 
       .participant-name-row {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-1);
+      }
+
+      .participant-role {
+        font-size: var(--text-xs);
+      }
+
+      .action-buttons {
+        padding: var(--space-3);
+      }
+
+      .glass-btn-lg {
+        font-size: var(--text-base);
+        padding: var(--space-3) var(--space-4);
       }
     }
   `,
