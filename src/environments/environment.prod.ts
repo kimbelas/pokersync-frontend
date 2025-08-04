@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  socketUrl: 'https://your-production-url.com',
-  apiUrl: 'https://your-production-url.com/api'
+  socketUrl: 'https://pokersync-backend.onrender.com',
+  apiUrl: 'https://pokersync-backend.onrender.com/api'
 };
