@@ -83,8 +83,20 @@ import { ViewportLayoutComponent } from '../../../../core/components/viewport-la
 
                   <div class="vote-status">
                     <div *ngIf="participant.role !== 'observer'" class="vote-indicator">
-                      <span *ngIf="hasVoted(participant.id) && votingPhase() === 'voting'" class="voted-icon animate-scale-in">✅</span>
-                      <span *ngIf="!hasVoted(participant.id) && votingPhase() === 'voting'" class="thinking-icon animate-pulse">🤔</span>
+                      <!-- During voting phase -->
+                      <ng-container *ngIf="votingPhase() === 'voting'">
+                        <!-- Show thinking emoji if current user is changing vote -->
+                        <span *ngIf="participant.id === currentUser()?.id && isChangingVote() && hasVoted(participant.id)" 
+                              class="thinking-icon animate-pulse">🤔</span>
+                        <!-- Show check if voted and not changing -->
+                        <span *ngIf="hasVoted(participant.id) && !(participant.id === currentUser()?.id && isChangingVote())" 
+                              class="voted-icon animate-scale-in">✅</span>
+                        <!-- Show thinking if not voted -->
+                        <span *ngIf="!hasVoted(participant.id)" 
+                              class="thinking-icon animate-pulse">🤔</span>
+                      </ng-container>
+                      
+                      <!-- During revealed phase - only show vote value, no check marks -->
                       <span *ngIf="votingPhase() === 'revealed' && getParticipantVote(participant.id)" 
                             class="vote-value glass-subtle animate-flip">{{ getParticipantVote(participant.id) }}</span>
                     </div>
@@ -1062,6 +1074,7 @@ export class VotingBoardComponent implements OnInit, OnDestroy {
   private readonly _selectedCard = signal<string | null>(null);
   private readonly _hasSubmittedVote = signal(false);
   private readonly _isSubmittingVote = signal(false);
+  private readonly _isChangingVote = signal(false);
   private readonly _error = signal<string | null>(null);
   private readonly _showResultsModal = signal(false);
   private readonly _userJoinedNotification = signal<string | null>(null);
@@ -1070,6 +1083,7 @@ export class VotingBoardComponent implements OnInit, OnDestroy {
   readonly selectedCard = computed(() => this._selectedCard());
   readonly hasSubmittedVote = computed(() => this._hasSubmittedVote());
   readonly isSubmittingVote = computed(() => this._isSubmittingVote());
+  readonly isChangingVote = computed(() => this._isChangingVote());
   readonly error = computed(() => this._error());
   readonly showResultsModal = computed(() => this._showResultsModal());
   readonly userJoinedNotification = computed(() => this._userJoinedNotification());
@@ -1128,6 +1142,7 @@ export class VotingBoardComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this._hasSubmittedVote.set(false);
         this._selectedCard.set(null);
+        this._isChangingVote.set(false);
       });
 
     // Listen for user joined events
@@ -1179,9 +1194,11 @@ export class VotingBoardComponent implements OnInit, OnDestroy {
     this.socketService.submitVote(card, 'simple-voting');
     this._hasSubmittedVote.set(true);
     this._isSubmittingVote.set(false);
+    this._isChangingVote.set(false);
   }
 
   changeVote(): void {
+    this._isChangingVote.set(true);
     this._hasSubmittedVote.set(false);
     this._selectedCard.set(null);
   }
@@ -1193,6 +1210,7 @@ export class VotingBoardComponent implements OnInit, OnDestroy {
   startNewRound(): void {
     this._hasSubmittedVote.set(false);
     this._selectedCard.set(null);
+    this._isChangingVote.set(false);
     // Trigger new voting round (moderator action)
     const room = this.currentRoom();
     if (room) {
